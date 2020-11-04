@@ -1,17 +1,16 @@
-//
-//  Cards.h
-//  assignment1
-//
-//  Created by Ebraheem Al Shapi.
-//
-
-
-
+// Author Ebraheem Al Shapi
+// Solution Risk
+// Project: Cards
+// Created at 1:34 AM 19/10/2020
+// Date: 02/11/2020   8:59 AM
+// File Name: Cards.cpp
 
 #include "Cards.h"
+#include <ctime>
+#include <iostream>
 #include <map>
 #include <string>
-#include <iostream>
+#include <vector>
 using namespace std;
 
 CardType spyCard = CardType::spy;
@@ -21,58 +20,46 @@ CardType blockadeCard = CardType::blockade;
 CardType airliftCard = CardType::airlift;
 CardType diplomacyCard = CardType::diplomacy;
 
-std::ostream& operator<<(std::ostream& out, const CardType value) {
-	static std::map<CardType, std::string> strings;
-	if (strings.size() == 0) {
-#define INSERT_ELEMENT(p) strings[p] = #p
-		INSERT_ELEMENT(spy);
-		INSERT_ELEMENT(bomb);
-		INSERT_ELEMENT(reinforcement);
-		INSERT_ELEMENT(blockade);
-		INSERT_ELEMENT(airlift);
-		INSERT_ELEMENT(diplomacy);
-#undef INSERT_ELEMENT
-	}
-
-	return out << strings[value];
-}
-
 unsigned int Card::nextCardID = 1;
 unsigned static int step = 1;
 
 Card::Card()
 {
-	cout << "\t" << nextCardID << ".Card()... " << endl;
-	this->cardType = { spyCard };
+	cout << "\t" << this->cardID << ".Card()... " << endl;
+	this->cardType = {&spyCard};
 	cardID = nextCardID++;
 }
 
 Card::~Card()
 {
+	cout << "\t" << this->cardID << " .~Card()..." << endl;
+	step++;
+	//delete cardType;
+	cardType = nullptr;
 }
 
-//Card::Card(const Card& card)
-//{
-//	cout << "Card(const Card& card)..." << endl;
-//	cardID = nextCardID;
-//	cardType = { card.cardType };
-//}
+Card::Card(const Card& card)
+{
+	cout << "Card(const Card& card)..." << endl;
+	cardID = nextCardID;
+	cardType = {card.cardType};
+}
 
-Card::Card(CardType armyType)
+Card::Card(CardType& armyType)
 {
 	cout << "\t" << nextCardID << " .Card(CardType armyType)..." << endl;
-	this->cardType = armyType;
+	this->cardType = &armyType;
 	cardID = nextCardID++;
 }
 
-CardType Card::getArmyType() const
+CardType& Card::getCardType() const
 {
-	return this->cardType;
+	return *cardType;
 }
 
-void Card::setArmyType(CardType& armytype)
+void Card::setCardType(CardType& armytype)
 {
-	cardType = armytype;
+	*cardType = armytype;
 }
 
 int Card::getCardID() const
@@ -80,39 +67,45 @@ int Card::getCardID() const
 	return cardID;
 }
 
-void Card::play(Hand& hand ,Deck& deck)
+void Card::play(Hand& hand, Deck& deck)
 {
 	cout << step << " .play(Hand& hand ,Deck& deck, CardType& type)... " << endl;
 	step++;
-	/*list<Card*>::iterator cardID = hand.getHandCards().begin();
+	vector<Card*>::iterator cardID = hand.getHandCards().begin();
 
-	for (int i = 1; i < hand.getHandCards().size(); i++) {
-		if ((*cardID)->getArmyType() == type) {
+	for (int i = 1; i < hand.getHandCards().size(); i++)
+	{
+		if ((*cardID)->getCardType() == this->getCardType())
+		{
 			break;
 		}
-		cardID++;
+		++cardID;
 	}
 
-	Card* selected = *cardID;*/
-
-	//front(): A reference to the first element in the list container.
-	Card* selected = hand.getHandCards().front();
-	//end(): An iterator to the element past the end of the sequence.
-	cout << step << " .Removing the card in the player hand." << endl;
-	step++;
-	hand.getHandCards().erase(hand.getHandCards().end());
-	cout << step << " .Placing the card back in the deck." << endl;
-	step++;
-	deck.getDeckCards().insert(deck.getDeckCards().end(), &*selected);
+	if (this->getCardType() == (*cardID)->getCardType())
+	{
+		Card* selected = *cardID;
+		//front(): A reference to the first element in the list container.
+		//Card* selected = hand.getHandCards().front();
+		//Card* selected = hand.getHandCards().back();
+		//end(): An iterator to the element past the end of the sequence.
+		cout << step << " .Removing the card in the player hand." << endl;
+		step++;
+		hand.getHandCards().erase(cardID);
+		cout << step << " .Placing the card back in the deck." << endl;
+		step++;
+		deck.getDeckCards()->insert(deck.getDeckCards()->end(), &*selected);
+	}
+	else
+	{
+		cout << "Player doesn't have this type of cards" << endl;
+	}
 }
-
-
-
 
 
 void Deck::generateCard(int numberOfCounteries)
 {
-	cout << step << " .generateCard()... "<<endl;
+	cout << step << " .generateCard()... " << endl;
 	step++;
 	//destributing the cards equally among the six categories
 	array<int, 6> cardTypeSize;
@@ -127,8 +120,10 @@ void Deck::generateCard(int numberOfCounteries)
 	int remainder = numberOfCounteries % 6;
 
 	// Randomly increasing the allocation of cards of random type based on the value of the remainder
-	if ((remainder) > 0) {
-		while (remainder != 0) {
+	if ((remainder) > 0)
+	{
+		while (remainder != 0)
+		{
 			cardTypeSize[remainder]++;
 			remainder--;
 		}
@@ -141,45 +136,47 @@ void Deck::generateCard(int numberOfCounteries)
 
 
 		//Selecting the type that has enough allocations
-		while (cardTypeSize[randType] == 0) {
-			if (randType == 5) {
+		while (cardTypeSize[randType] == 0)
+		{
+			if (randType == 5)
+			{
 				randType = 0;
 			}
-			else {
+			else
+			{
 				randType++;
 			}
 		}
 
+
 		//creating card based on the selected type
-		if (randType == 0) {
-			allCards.push_back(Card(CardType::spy));
+		if (randType == 0)
+		{
+			deckCards->push_back(new Card(spyCard));
 		}
-		else if (randType == 1) {
-			allCards.push_back(Card(CardType::bomb));
+		else if (randType == 1)
+		{
+			deckCards->push_back(new Card(bombCard));
 		}
-		else if (randType == 2) {
-			allCards.push_back(Card(CardType::reinforcement));
+		else if (randType == 2)
+		{
+			deckCards->push_back(new Card(reinforcementCard));
 		}
-		else if (randType == 3) {
-			allCards.push_back(Card(CardType::blockade));
+		else if (randType == 3)
+		{
+			deckCards->push_back(new Card(blockadeCard));
 		}
-		else if (randType == 4) {
-			allCards.push_back(Card(CardType::airlift));
+		else if (randType == 4)
+		{
+			deckCards->push_back(new Card(airliftCard));
 		}
-		else if (randType == 5) {
-			allCards.push_back(Card(CardType::diplomacy));
+		else if (randType == 5)
+		{
+			deckCards->push_back(new Card(diplomacyCard));
 		}
 
 		//decreasing the capacity of allocations of that random type
 		cardTypeSize[randType]--;
-
-	}
-
-	// creating a list with the addresses of cards in allCards
-	for (list<Card>::iterator it = allCards.begin(); it != allCards.end(); ++it) {
-		Card* cardPtr = &*it;
-		//deckCards.push_front(cardPtr);
-		list<Card*>::iterator currentCard = deckCards.insert(deckCards.end(), cardPtr);
 	}
 }
 
@@ -189,36 +186,53 @@ Deck::Deck()
 
 Deck::~Deck()
 {
+	cout << step << " .~Deck()..." << endl;
+	step++;
+
+	for (auto& card : *deckCards)
+	{
+		delete card;
+		card = nullptr;
+	}
+	deckCards->clear(); //will remove the "placeholder memory
+	deckCards = nullptr;
 }
 
 Deck::Deck(int numberOfCounteries)
 {
-	cout << step << " .Deck(int numberOfCounteries)..." <<endl;
+	deckCards = new vector<Card*>;
+	srand(static_cast<unsigned>(time(nullptr)));
+	cout << step << " .Deck(int numberOfCounteries)..." << endl;
 	step++;
 	generateCard(numberOfCounteries);
+}
+
+Deck::Deck(Deck& numberOfCounteries)
+{
+	cout << "Deck::Deck(Deck&)" << endl;
 }
 
 Card* Deck::draw()
 {
 	cout << step << " .draw(list<Card*> handCards)..." << endl;
 	step++;
-	int random = (rand() % deckCards.size()) + 1;
-	list<Card*>::iterator cardID = deckCards.begin();
+	int random = (rand() % deckCards->size()) + 1;
+	vector<Card*>::iterator cardID = deckCards->begin();
 
-	for (int i = 1; i < random; i++) {
-		cardID++;
+	for (int i = 1; i < random; i++)
+	{
+		++cardID;
 	}
 
 	Card* selected = *cardID;
-	cout << step << " .Removing " << *selected << " from the card in the player hand." << endl;
+	cout << step << " .Removing " << *selected << " from the cards deck." << endl;
 	step++;
-	deckCards.erase(cardID);
-	cout << step << " .Removing " << *selected << " from the card in the player hand." << endl;
+	deckCards->erase(cardID);
 
 	return &*selected;
 }
 
-void Deck::draw(Hand &hand)
+void Deck::draw(Hand& hand)
 {
 	Card* selected = draw();
 	cout << step << " .Placing the card in the player hand." << endl;
@@ -233,61 +247,88 @@ Hand::Hand()
 	step++;
 }
 
+
 Hand::~Hand()
 {
+	cout << step << " .~Hand()..." << endl;
+	step++;
+
+	for (int i = 0; i < handCards.size(); i++)
+	{
+		delete handCards.at(i);
+		handCards[i] = nullptr;
+	}
+	handCards.clear(); //will remove the "placeholder memory
 }
 
-list<Card*>& Hand::getHandCards()
+vector<Card*>& Hand::getHandCards()
 {
 	return handCards;
 }
 
-void Hand::setHandCards(list<Card*> handCards)
+vector<Card*> Hand::getHandCards() const
+{
+	return handCards;
+}
+
+void Hand::setHandCards(vector<Card*>& handCards)
 {
 	this->handCards = handCards;
 }
 
 
-list<Card> Deck::getAllCards() const
-{
-	return allCards;
-}
-
-void Deck::setAllCards(list<Card> allCards)
-{
-	this->allCards = allCards;
-}
-
-list<Card*>& Deck::getDeckCards() 
+vector<Card*>* Deck::getDeckCards()
 {
 	return deckCards;
 }
 
-void Deck::setDeckCards(list<Card*> deckCards)
+void Deck::setDeckCards(vector<Card*>& deckCards)
 {
-	this->deckCards = deckCards;
+	this->deckCards = &deckCards;
 }
 
 ostream& operator<<(ostream& strm, const Card& card)
 {
-	strm << "(CardID:" << card.getCardID() << ", " << "Card Type:" << card.cardType <<")";
+	strm << "(CardID:" << card.getCardID() << ", " << "Card Type:" << card.getCardType() << ")";
 	return strm;
-	
 }
 
 ostream& operator<<(ostream& strm, const Deck& deck)
 {
 	// TODO: insert return statement here
-	strm;
-	return strm;
-}
-
-ostream& operator<<(ostream& strm,Hand hand)
-{
-	// TODO: insert return statement here
-	for (auto const& i : hand.getHandCards()) {
-		strm << i << " ";
+	for (auto& card : *(deck.deckCards))
+	{
+		strm << *card << '\n';
 	}
 	return strm;
 }
 
+ostream& operator<<(ostream& strm, const Hand hand)
+{
+	// TODO: insert return statement here
+	for (auto const& i : hand.getHandCards())
+	{
+		strm << i << " ";
+	}
+	strm << endl;
+	return strm;
+}
+
+
+std::ostream& operator<<(std::ostream& out, const CardType value)
+{
+	static std::map<CardType, std::string> strings;
+	if (strings.size() == 0)
+	{
+#define INSERT_ELEMENT(p) strings[p] = #p
+		INSERT_ELEMENT(CardType::spy);
+		INSERT_ELEMENT(CardType::bomb);
+		INSERT_ELEMENT(CardType::reinforcement);
+		INSERT_ELEMENT(CardType::airlift);
+		INSERT_ELEMENT(CardType::diplomacy);
+		INSERT_ELEMENT(CardType::blockade);
+#undef INSERT_ELEMENT
+	}
+
+	return out << strings[value];
+}
