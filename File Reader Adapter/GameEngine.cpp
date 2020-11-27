@@ -10,7 +10,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "ConquestFileReader.h"
 #include "MapLoader.h"
 using namespace std;
 namespace fs = std::filesystem;
@@ -88,7 +87,7 @@ void GameStart::start_game()
 
 	std::cout << "Entering GameStart::start_game()\n" << std::endl;
 	
-	ConquestFileReader l;
+	MapLoader* l;
 	const std::string path = "Map files\\";
 	int index = 0;
 	std::vector<std::string> choices;
@@ -105,7 +104,17 @@ void GameStart::start_game()
 			}	
 	}
 	cin >> index;
-	l.LoadMap(choices[index-1]);
+	if (choices[index - 1].find("(Conquest Map)")!=string::npos)
+	{
+		ConquestFileReader cfr;
+		l = new ConquestFileReaderAdapter(&cfr);
+		l->LoadMap(choices[index - 1]);
+	}else
+	{
+		l = new MapLoader();
+		l->LoadMap(choices[index - 1]);
+	}
+	
 
 	std::cout << "Exiting GameStart::start_game()\n" << std::endl;
 }
