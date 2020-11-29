@@ -1,8 +1,10 @@
 ﻿#include <string>
 #include <vector>
-#include "Continent.h"
-#include "Territory.h"
 
+
+
+struct continent { std::string continentName; int continentId; int armyValue; };
+struct country { std::string countryName; int continentId; std::string continentName; int x; int y; std::vector<int> borders; std::vector<std::string> borders_name; };
 
 class MapLoader
 	{

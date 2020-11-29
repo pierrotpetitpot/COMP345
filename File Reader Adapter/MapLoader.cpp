@@ -211,7 +211,7 @@ void MapLoader::LoadMap(std::string path) {
 
 		}
 
-	// bt Ebraheem Al shapi
+	// by Ebraheem Al Shapi
 	print();
 
 
