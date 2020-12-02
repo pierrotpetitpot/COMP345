@@ -21,70 +21,12 @@ namespace fs = std::filesystem;
 
 
 
-GameStart::GameStart(): number_of_players_(2), phase_switch(false), game_statistics_switch(false)
+GameStart::GameStart()
 {
-}
-
-int GameStart::get_number_of_players() const
-{
-	return number_of_players_;
-}
-
-void GameStart::set_number_of_players(int number_of_players)
-{
-	number_of_players_ = number_of_players;
-}
-
-bool GameStart::is_phase_switch() const
-{
-	return phase_switch;
-}
-
-void GameStart::set_phase_switch(bool phase_switch)
-{
-	this->phase_switch = phase_switch;
-}
-
-bool GameStart::is_game_statistics_switch() const
-{
-	return game_statistics_switch;
-}
-
-void GameStart::set_game_statistics_switch(bool game_statistics_switch)
-{
-	this->game_statistics_switch = game_statistics_switch;
 }
 
 void GameStart::start_game()
 {
-	//selecting the number of player
-	/*std::cout << "Enter the number of players (2-5)" << std::endl;
-	int index;
-	cin >> index;
-	while (index>5 || index<2)
-	{
-		std::cout << "Please, a number between 2 and 5 " << std::endl;
-		cin >> index;
-	}
-	number_of_players_ = index;*/
-
-	//Enabling or disabling phase switch
-	/*std::cout << "Do want information about game phases? (Yes\\No)" << std::endl;
-	string answer;
-	cin >> answer;
-	if (to_lower(answer) == "yes")
-		{
-		phase_switch =true ;
-		}*/
-
-	//Enabling or disabling game statistics switch
-	/*std::cout << "Do want information about game statistics? (Yes\\No)" << std::endl;
-	cin >> answer;
-	if (to_lower(answer) == "yes")
-		{
-		game_statistics_switch = true;
-		}*/
-
 	std::cout << "Entering GameStart::start_game()\n" << std::endl;
 	
 	MapLoader* l;

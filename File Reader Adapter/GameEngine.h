@@ -14,18 +14,9 @@ using namespace std;
 class GameStart
 {
 private:
-	int number_of_players_;
-	bool phase_switch;
-	bool game_statistics_switch;
 public:
 
 	GameStart();
-	int get_number_of_players() const;
-	void set_number_of_players(int number_of_players);
-	bool is_phase_switch() const;
-	void set_phase_switch(bool phase_switch);
-	bool is_game_statistics_switch() const;
-	void set_game_statistics_switch(bool game_statistics_switch);
 	void start_game();
 };
 
